@@ -3,3 +3,4 @@ edge-tts
 ddddocr>=1.3.1
 flask
 cryptography
+requests
