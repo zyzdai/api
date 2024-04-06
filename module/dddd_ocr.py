@@ -86,8 +86,9 @@ def set_ret(result, ret_type='text'):
 def get_captcha(url):
     try:
         img = requests.get(url).content
-        code = server
+        code = server.classification(img)
+        return code
     except Exception as e:  # just base64 of single image
-        pass
+        return ''
     
 
