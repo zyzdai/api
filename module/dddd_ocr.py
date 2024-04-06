@@ -1,6 +1,7 @@
 import base64
 import json
 import ddddocr
+import requests
 # ddddocr
 class Server(object):
     def __init__(self, ocr=True, det=False, old=False):
@@ -53,13 +54,18 @@ server = Server(det=True, old=False)
 def get_img(request, img_type='file', img_name='image'):
     if img_type == 'b64':
         img = base64.b64decode(request.get_data())
-        try:  # json str of multiple images
+        try:  
             dic = json.loads(img)
             img = base64.b64decode(dic.get(img_name).encode())
         except Exception as e:  # just base64 of single image
             pass
     if img_type == 'file':
         img = request.files.get(img_name).read()
+    if img_type == 'url':
+        try:
+            img = requests.get(request.get_data()).content
+        except Exception as e:  # just base64 of single image
+            pass
     return img
 
 
