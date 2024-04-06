@@ -1,8 +1,7 @@
 import os
 import threading
-
 from flask import Flask, request, jsonify, make_response, send_from_directory, redirect,render_template
-from module import ttson,edge_tts,tools,fanqie,jm,rar2zip,_51cg
+from module import ttson,edge_tts,tools,fanqie,jm,rar2zip,_51cg,dddd_ocr
 app = Flask(__name__)
 
 
@@ -89,6 +88,14 @@ def cg_decrypt_image():
         return response
     except Exception as e:
         return jsonify({"code": "异常", "message": "{}".format(e)})
+@app.route('/dddd_ocr', methods=['GET', 'POST'])
+def go_dddd_ocr():
+    url = request.args.get('url')
+    if len(url) <= 0:
+        return jsonify({"code": "异常", "message": "url参数不能为空"})
+    code = dddd_ocr.get_captcha(url)
+    return jsonify({"code": "正常", "message": "{}".format(code)})
+
 
 if __name__ == '__main__':
     app.config["MODULE"] = 'module'
