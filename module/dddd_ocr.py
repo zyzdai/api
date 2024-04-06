@@ -82,4 +82,12 @@ def set_ret(result, ret_type='text'):
             return ''
         else:
             return str(result).strip()
+            
+def get_captcha(url):
+    try:
+        img = requests.get(url).content
+        code = server
+    except Exception as e:  # just base64 of single image
+        pass
+    
 
