@@ -88,21 +88,34 @@ def cg_decrypt_image():
         return response
     except Exception as e:
         return jsonify({"code": "异常", "message": "{}".format(e)})
-@app.route('/dddd_ocr_b64', methods=['POST'])
-def go_dddd_ocr_b64():
-    data = request.data.decode('utf-8')
-    if len(data) <= 0:
-        return jsonify({"code": "异常", "message": "data参数不能为空"})
-    code = dddd_ocr.get_captcha_fromB64(data)
-    return jsonify({"code": "正常", "message": "{}".format(code)})
 
-@app.route('/dddd_ocr', methods=['GET', 'POST'])
-def go_dddd_ocr_url():
-    url = request.args.get('url')
-    if len(url) <= 0:
-        return jsonify({"code": "异常", "message": "url参数不能为空"})
-    code = dddd_ocr.get_captcha(url)
-    return jsonify({"code": "正常", "message": "{}".format(code)})
+@app.route('/<opt>/<img_type>', methods=['POST'])
+@app.route('/<opt>/<img_type>/<ret_type>', methods=['POST'])
+def ocr(opt, img_type='file', ret_type='text'):
+    try:
+        img = dddd_ocr.get_img(request, img_type)
+        if opt == 'ocr':
+            result = dddd_ocr.server.classification(img)
+        elif opt == 'det':
+            result = dddd_ocr.server.detection(img)
+        else:
+            raise f"<opt={opt}> is invalid"
+        return dddd_ocr.set_ret(result, ret_type)
+    except Exception as e:
+        return dddd_ocr.set_ret(e, ret_type)
+
+
+@app.route('/slide/<algo_type>/<img_type>', methods=['POST'])
+@app.route('/slide/<algo_type>/<img_type>/<ret_type>', methods=['POST'])
+def slide(algo_type='compare', img_type='file', ret_type='text'):
+    try:
+        target_img = dddd_ocr.get_img(request, img_type, 'target_img')
+        bg_img = dddd_ocr.get_img(request, img_type, 'bg_img')
+        result = dddd_ocr.server.slide(target_img, bg_img, algo_type)
+        return dddd_ocr.set_ret(result, ret_type)
+    except Exception as e:
+        return dddd_ocr.set_ret(e, ret_type)
+
 
 
 if __name__ == '__main__':
