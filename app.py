@@ -88,8 +88,16 @@ def cg_decrypt_image():
         return response
     except Exception as e:
         return jsonify({"code": "异常", "message": "{}".format(e)})
+@app.route('/dddd_ocr_b64', methods=['POST'])
+def go_dddd_ocr_b64():
+    data = request.data.decode('utf-8')
+    if len(data) <= 0:
+        return jsonify({"code": "异常", "message": "data参数不能为空"})
+    code = dddd_ocr.get_captcha_fromB64(data)
+    return jsonify({"code": "正常", "message": "{}".format(code)})
+
 @app.route('/dddd_ocr', methods=['GET', 'POST'])
-def go_dddd_ocr():
+def go_dddd_ocr_url():
     url = request.args.get('url')
     if len(url) <= 0:
         return jsonify({"code": "异常", "message": "url参数不能为空"})
