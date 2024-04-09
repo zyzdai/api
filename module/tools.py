@@ -60,3 +60,5 @@ def generate_random_number(digit=16):
     # 生成随机数
     random_number = random.randint(min_value, max_value)
     return random_number
+
+

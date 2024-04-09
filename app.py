@@ -1,9 +1,102 @@
+import json
 import os
 import threading
-from flask import Flask, request, jsonify, make_response, send_from_directory, redirect,render_template
+import time
+import uuid
+
+from flask import Flask, request, jsonify, make_response, send_from_directory, redirect, render_template, send_file
 from module import ttson,edge_tts,tools,fanqie,jm,rar2zip,_51cg,dddd_ocr
 app = Flask(__name__)
 
+# 设置允许上传的文件类型
+ALLOWED_EXTENSIONS = {'xbs'}
+XBS_REBUILD_PATH = './xbsrebuild_linux'
+# 初始化全局变量
+# 是否完成
+is_done = False
+update_xbs_path = ''
+xbs_check_result = {}
+# 待删除的文件
+to_delete_files = []
+
+def xbs2json(xbs_path):
+    global to_delete_files
+    out_path = os.path.join(app.config["JSON"],str(uuid.uuid4())+'.json')
+    to_delete_files.append(out_path)
+    cmd = f'./{XBS_REBUILD_PATH} xbs2json -i {xbs_path} -o {out_path}'
+    os.system(cmd)
+    if not os.path.exists(out_path):
+        print('xbsrebuild failed')
+        exit(0)
+    else:
+        return out_path
+
+def json2xbs(json_path):
+    out_path = os.path.join(app.config["UPDATE_XBS"],str(uuid.uuid4())+'.xbs')
+    cmd = f'./{XBS_REBUILD_PATH} json2xbs -i {json_path} -o {out_path}'
+    os.system(cmd)
+    if not os.path.exists(out_path):
+        print('xbsrebuild failed')
+        exit(0)
+    else:
+        return out_path
+
+# 定义允许上传文件的函数
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def updatePwd(xbs_path):
+    global update_xbs_path,is_done
+    tmp = xbs2json(xbs_path)
+    os.remove(xbs_path)
+    # 打开文件修改密码
+    with open(tmp,'r') as f:
+        data = json.load(f)
+        for key, value in data.items():
+            if isinstance(value, dict):
+                if 'password' in value:
+                    del value['password']
+                if 'lastModifyTime' in value:
+                    # 1708308624.367167
+                    value['lastModifyTime'] = str(time.time())
+                with open(tmp,'w') as f:
+                    json.dump(data,f,indent=4)
+    update_xbs_path = json2xbs(tmp)
+    os.remove(tmp)
+    is_done = True
+
+
+
+# 定义首页路由,上传文件
+@app.route('/nopwd', methods=['GET', 'POST'])
+def index():
+    global xbs_path,is_done,to_delete_files
+    is_done = False
+    if request.method == 'POST':
+        file = request.files['file']
+        # 保存文件到uploads文件夹,重命名xbs
+        if file and allowed_file(file.filename):
+            filename = str(uuid.uuid4())+".xbs"
+            xbs_path = os.path.join(app.config['XBS'], filename)
+            to_delete_files.append(xbs_path)
+            file.save(xbs_path)
+            updatePwd(xbs_path)
+            return jsonify({'redirect': request.url})
+    return render_template('index.html')
+@app.route('/download', methods=['GET'])
+def download_file():
+    global update_xbs_path
+    return send_file(update_xbs_path, as_attachment=True)
+# 刷新结果
+@app.route('/refresh', methods=['GET'])
+def refresh_result():
+    global is_done,xbs_check_result
+    if is_done:
+        # 构建更新后xbs下载链接
+        return jsonify({'status': 'finished', 'message': '完成','xbs_check_result':xbs_check_result})
+    else:
+        return jsonify({'status': 'running', 'message': '尚未完成','xbs_check_result':xbs_check_result})
 
 @app.route('/')
 def tts():
@@ -123,7 +216,14 @@ if __name__ == '__main__':
     app.config["TMP"] = 'tmp'
     os.makedirs(app.config["MODULE"], exist_ok=True)
     os.makedirs(app.config["TMP"], exist_ok=True)
-
+    app.config['WORKER'] = 'worker'
+    app.config['UPDATE_XBS'] = 'worker/update_xbs'
+    app.config['XBS'] = 'worker/xbs'
+    app.config['JSON'] = 'worker/json'
+    os.makedirs(app.config['WORKER'], exist_ok=True)
+    os.makedirs(app.config['XBS'], exist_ok=True)
+    os.makedirs(app.config['UPDATE_XBS'], exist_ok=True)
+    os.makedirs(app.config['JSON'], exist_ok=True)
     # 启动清理 tmp 目录的线程
     clean_thread = threading.Thread(target=tools.clean_tmp_directory)
     clean_thread.start()
