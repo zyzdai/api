@@ -9,8 +9,7 @@ RUN cd /app \
     && pip3 install --no-cache-dir -r requirements.txt\
     && rm -rf /tmp/* && rm -rf /root/.cache/* \
     && apt-get --allow-releaseinfo-change update\
-    && apt-get install unar -y\
-    && chmod +x ./xbsrebuild_linux
+    && apt-get install unar -y
 
 # 设置系统时区
 RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone
