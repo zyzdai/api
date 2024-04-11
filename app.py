@@ -7,9 +7,7 @@ app = Flask(__name__)
 @app.route('/')
 def rImg():
     img = randomImg.img()
-    response = make_response(render_template('random_image.html', image_url=img))
-    response.headers['Access-Control-Allow-Origin'] = '*'  # 允许所有域名跨域访问，也可以设置为具体的域名
-    return response
+    return redirect(img)
 
 @app.route('/ttson', methods=['GET', 'POST'])
 def go_ttson():
