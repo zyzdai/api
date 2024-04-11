@@ -6,8 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def rImg():
-    img = randomImg.img()
-    return redirect(img)
+    return 'tts'
 
 @app.route('/ttson', methods=['GET', 'POST'])
 def go_ttson():
