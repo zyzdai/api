@@ -13,7 +13,7 @@ def remove_html(string):
 def clearTmpFiles(sec=120):
     files = os.listdir(os.path.join(os.getcwd(), 'tmp'))
     for file in files:
-        if file.endswith('mp3'):
+        if file.endswith('mp3') or file.endswith('wav'):
             zip_file_time = os.path.getmtime(file)
             if (time.time() - zip_file_time) > sec:
                 os.remove(file)

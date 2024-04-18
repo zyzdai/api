@@ -1,9 +1,13 @@
 import hashlib
+import os
+import subprocess
+import uuid
 from datetime import datetime, timedelta
 import random
 import requests
 from module import dddd_ocr,tools
-
+TMP_DIR = 'tmp/qqttson'
+os.makedirs(TMP_DIR, exist_ok=True)
 def getXch():
     current_time = (datetime.now() - timedelta(hours=8)).isoformat()[:13]
     timestamped_string = "alex" + current_time
@@ -68,3 +72,29 @@ def create(voice_id, speed_factor, text, pitch_factor):
                 break
     url = f'{jsondata["url"]}:{jsondata["port"]}/flashsummary/retrieveFileData?stream=True&voice_audio_path={jsondata["voice_path"]}'
     return url
+def convert_to_wav(url):
+    print(f"正在下载音频文件，请稍等..."+url)
+    file_name = f'{uuid.uuid4()}.wav'
+    wav_path = os.path.join(TMP_DIR, file_name)
+    with open(wav_path, 'wb') as f:
+        f.write(requests.get(url).content)
+
+    file_output = wav_path + '.wav'
+    try:
+        # Convert to WAV
+        convert_command = f'ffmpeg -y -i "{wav_path}" -acodec pcm_s16le -f s16le -ac 1 -ar 24000 "{file_output}" -loglevel error'
+        convert_process = subprocess.run(convert_command, shell=True, capture_output=True, text=True)
+        if convert_process.returncode != 0:
+            return f'An error occurred while converting {wav_path} to .wav. Details: {convert_process.stderr.strip()}'
+
+        # Get sample rate
+        probe_command = f'ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 "{wav_path}"'
+        probe_process = subprocess.run(probe_command, shell=True, capture_output=True, text=True)
+        if probe_process.returncode != 0:
+            return f'An error occurred while obtaining the sample rate. Details: {probe_process.stderr.strip()}'
+        # sample_rate = probe_process.stdout.strip()
+
+        return file_output
+    except Exception as e:
+        return f'An unknown error occurred. Details: {str(e)}'
+

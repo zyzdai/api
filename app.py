@@ -1,15 +1,13 @@
 import os
 import threading
-from flask import Flask, request, jsonify, make_response, send_from_directory, redirect, render_template
+from flask import Flask, request, jsonify, make_response, send_from_directory, redirect
 from module import ttson,edge_tts,tools,fanqie,jm,rar2zip,_51cg,dddd_ocr,randomImg
 app = Flask(__name__)
 
 @app.route('/')
 def rImg():
     img = randomImg.img()
-    response = make_response(render_template('random_image.html', image_url=img))
-    response.headers['Access-Control-Allow-Origin'] = '*'  # 允许所有域名跨域访问，也可以设置为具体的域名
-    return response
+    return redirect(img)
 
 @app.route('/ttson', methods=['GET', 'POST'])
 def go_ttson():
@@ -22,6 +20,26 @@ def go_ttson():
         return jsonify({"code": "异常", "message": "参数不能为空"})
     url = ttson.create(voice_id, speed_factor, text, pitch_factor)
     return redirect(url)
+
+@app.route('/qqttson', methods=['GET', 'POST'])
+def go_qqttson():
+    voice_id = request.args.get('voice_id')
+    speed_factor = request.args.get('speed_factor')
+    text = request.args.get('text')
+    pitch_factor = request.args.get('pitch_factor')
+    is_None = tools.isEmpty((voice_id, speed_factor, text, pitch_factor))
+    if is_None:
+        return jsonify({"code": "异常", "message": "参数不能为空"})
+    url = ttson.create(voice_id, speed_factor, text, pitch_factor)
+    filepath = ttson.convert_to_wav(url)
+    r = os.path.split(filepath)
+    try:
+        response = make_response(
+            send_from_directory(r[0], r[1], as_attachment=True))
+        return response
+    except Exception as e:
+        return jsonify({"code": "异常", "message": "{}".format(e)})
+
 
 @app.route('/edge_tts', methods=['GET', 'POST'])
 def go_edge_tts():
