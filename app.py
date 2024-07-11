@@ -5,7 +5,7 @@ from module import ttson,edge_tts,tools,fanqie,jm,rar2zip,_51cg,dddd_ocr,randomI
 app = Flask(__name__)
 
 @app.route('/ping')
-def rImg():
+def ping():
     return 'pong'
 
 @app.route('/')
