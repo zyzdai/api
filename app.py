@@ -4,6 +4,10 @@ from flask import Flask, request, jsonify, make_response, send_from_directory, r
 from module import ttson,edge_tts,tools,fanqie,jm,rar2zip,_51cg,dddd_ocr,randomImg
 app = Flask(__name__)
 
+@app.route('/ping')
+def rImg():
+    return 'pong'
+
 @app.route('/')
 def rImg():
     img = randomImg.img()
