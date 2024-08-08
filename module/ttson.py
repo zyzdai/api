@@ -94,8 +94,7 @@ def convert_to_wav(url):
             return f'An error occurred while converting {wav_path} to .wav. Details: {convert_process.stderr.strip()}'
 
         # Get sample rate
-        probe_command = f'ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 "{
-            wav_path}"'
+        probe_command = f'ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 "{wav_path}"'
         probe_process = subprocess.run(
             probe_command, shell=True, capture_output=True, text=True)
         if probe_process.returncode != 0:
