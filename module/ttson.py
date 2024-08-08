@@ -73,8 +73,7 @@ def create(voice_id, speed_factor, text, pitch_factor):
             i = i + 1
             if i > 3:
                 break
-    url = f'{jsondata["url"]}:{
-        jsondata["port"]}/flashsummary/retrieveFileData?stream=True&voice_audio_path={jsondata["voice_path"]}'
+    url = f'{jsondata["url"]}:{jsondata["port"]}/flashsummary/retrieveFileData?stream=True&voice_audio_path={jsondata["voice_path"]}'
     return url
 
 
@@ -88,8 +87,7 @@ def convert_to_wav(url):
     file_output = wav_path + '.wav'
     try:
         # Convert to WAV
-        convert_command = f'ffmpeg -y -i "{
-            wav_path}" -acodec pcm_s16le -f s16le -ac 1 -ar 24000 "{file_output}" -loglevel error'
+        convert_command = f'ffmpeg -y -i "{wav_path}" -acodec pcm_s16le -f s16le -ac 1 -ar 24000 "{file_output}" -loglevel error'
         convert_process = subprocess.run(
             convert_command, shell=True, capture_output=True, text=True)
         if convert_process.returncode != 0:
