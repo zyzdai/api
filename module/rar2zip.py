@@ -13,11 +13,12 @@ def rar2zip(rar_file):
     rar = rarfile.RarFile(rar_file)
     # 取rar_file文件名
     file_name = os.path.basename(rar_file).split('.')[0]
-    work_dir = os.path.join(TMP_DIR,file_name)
+    work_dir = os.path.join(TMP_DIR, file_name)
     rar.extractall(work_dir)
     rar.close()
     zip_file = os.path.join(TMP_DIR, f'{uuid.uuid4()}')
-    shutil.make_archive(zip_file, 'zip',os.path.join(os.path.dirname(rar_file), file_name))
+    shutil.make_archive(zip_file, 'zip', os.path.join(
+        os.path.dirname(rar_file), file_name))
     shutil.rmtree(work_dir)
     os.remove(rar_file)
     # 清除超过1天的zip文件
@@ -42,7 +43,7 @@ def r2z(url):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
     }
-    response = requests.get(url, headers=headers,stream=True)
+    response = requests.get(url, headers=headers, stream=True)
     # 检查请求是否成功
     if response.status_code == 200:
         # 打开文件并写入内容
@@ -53,5 +54,3 @@ def r2z(url):
         print("文件下载失败")
     zipName = rar2zip(filePath)
     return zipName
-
-

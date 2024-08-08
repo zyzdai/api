@@ -5,26 +5,30 @@ import uuid
 from datetime import datetime, timedelta
 import random
 import requests
-from module import dddd_ocr,tools
+from module import dddd_ocr, tools
 TMP_DIR = 'tmp/qqttson'
 os.makedirs(TMP_DIR, exist_ok=True)
+
+
 def getXch():
     current_time = (datetime.now() - timedelta(hours=8)).isoformat()[:13]
     timestamped_string = "alex" + current_time
     hashed_string = hashlib.md5(timestamped_string.encode()).hexdigest()
     return hashed_string
 
+
 def generate_random_ip():
     ip = ".".join(str(random.randint(0, 255)) for _ in range(4))
     return ip
+
+
 def get_captcha():
     # 取随机数7694230510251072
     t = tools.generate_random_number()
-    url = f"https://u95167-bd74-2aef8085.westx.seetacloud.com:8443/flashsummary/captcha?0.{t}"
+    url = f"https://u95167-bd74-2aef8085.westx.seetacloud.com:8443/flashsummary/captcha?0.{
+        t}"
     code = dddd_ocr.get_captcha(url)
     return code
-
-
 
 
 def create(voice_id, speed_factor, text, pitch_factor):
@@ -70,8 +74,11 @@ def create(voice_id, speed_factor, text, pitch_factor):
             i = i + 1
             if i > 3:
                 break
-    url = f'{jsondata["url"]}:{jsondata["port"]}/flashsummary/retrieveFileData?stream=True&voice_audio_path={jsondata["voice_path"]}'
+    url = f'{jsondata["url"]}:{
+        jsondata["port"]}/flashsummary/retrieveFileData?stream=True&voice_audio_path={jsondata["voice_path"]}'
     return url
+
+
 def convert_to_wav(url):
     print(f"正在下载音频文件，请稍等..."+url)
     file_name = f'{uuid.uuid4()}.wav'
@@ -82,14 +89,18 @@ def convert_to_wav(url):
     file_output = wav_path + '.wav'
     try:
         # Convert to WAV
-        convert_command = f'ffmpeg -y -i "{wav_path}" -acodec pcm_s16le -f s16le -ac 1 -ar 24000 "{file_output}" -loglevel error'
-        convert_process = subprocess.run(convert_command, shell=True, capture_output=True, text=True)
+        convert_command = f'ffmpeg -y -i "{
+            wav_path}" -acodec pcm_s16le -f s16le -ac 1 -ar 24000 "{file_output}" -loglevel error'
+        convert_process = subprocess.run(
+            convert_command, shell=True, capture_output=True, text=True)
         if convert_process.returncode != 0:
             return f'An error occurred while converting {wav_path} to .wav. Details: {convert_process.stderr.strip()}'
 
         # Get sample rate
-        probe_command = f'ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 "{wav_path}"'
-        probe_process = subprocess.run(probe_command, shell=True, capture_output=True, text=True)
+        probe_command = f'ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 "{
+            wav_path}"'
+        probe_process = subprocess.run(
+            probe_command, shell=True, capture_output=True, text=True)
         if probe_process.returncode != 0:
             return f'An error occurred while obtaining the sample rate. Details: {probe_process.stderr.strip()}'
         # sample_rate = probe_process.stdout.strip()
@@ -97,4 +108,3 @@ def convert_to_wav(url):
         return file_output
     except Exception as e:
         return f'An unknown error occurred. Details: {str(e)}'
-

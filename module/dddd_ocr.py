@@ -3,6 +3,8 @@ import json
 import ddddocr
 import requests
 # ddddocr
+
+
 class Server(object):
     def __init__(self, ocr=True, det=False, old=False):
         self.ocr_option = ocr
@@ -54,7 +56,7 @@ server = Server(det=True, old=False)
 def get_img(request, img_type='file', img_name='image'):
     if img_type == 'b64':
         img = base64.b64decode(request.get_data())
-        try:  
+        try:
             dic = json.loads(img)
             img = base64.b64decode(dic.get(img_name).encode())
         except Exception as e:  # just base64 of single image
@@ -69,8 +71,6 @@ def get_img(request, img_type='file', img_name='image'):
     return img
 
 
-
-
 def set_ret(result, ret_type='text'):
     if ret_type == 'json':
         if isinstance(result, Exception):
@@ -82,7 +82,8 @@ def set_ret(result, ret_type='text'):
             return ''
         else:
             return str(result).strip()
-            
+
+
 def get_captcha(url):
     try:
         img = requests.get(url).content
@@ -90,5 +91,3 @@ def get_captcha(url):
         return code
     except Exception as e:  # just base64 of single image
         return ''
-    
-

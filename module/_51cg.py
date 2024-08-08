@@ -7,19 +7,23 @@ from cryptography.hazmat.backends import default_backend
 TMP_DIR = 'tmp/51cg'
 os.makedirs(TMP_DIR, exist_ok=True)
 
+
 def De(ciphertext, key, iv):
     if not isinstance(key, bytes):
         key = key.encode()
     if not isinstance(iv, bytes):
         iv = iv.encode()
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
+                    backend=default_backend())
     decryptor = cipher.decryptor()
     decrypted_data = decryptor.update(ciphertext) + decryptor.finalize()
     unpadder = padding.PKCS7(128).unpadder()
     data = unpadder.update(decrypted_data) + unpadder.finalize()
     return data
+
+
 def decrypt_image(url):
-    out_path = os.path.join(TMP_DIR,f'{uuid.uuid4()}.jpg')
+    out_path = os.path.join(TMP_DIR, f'{uuid.uuid4()}.jpg')
     response = requests.get(url)
     print(response.status_code)
     res = response.content

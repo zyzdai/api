@@ -1,15 +1,21 @@
 # 删除html标签
+import requests
 import os
 import random
 import re
 import time
+import base64
 TMP_DIR = 'tmp'
 # 删除html标签
+
+
 def remove_html(string):
     regex = re.compile(r'<[^>]+>')
     return regex.sub('', string)
 
 # 删除tmp目录过期的文件
+
+
 def clearTmpFiles(sec=120):
     files = os.listdir(os.path.join(os.getcwd(), 'tmp'))
     for file in files:
@@ -17,6 +23,7 @@ def clearTmpFiles(sec=120):
             zip_file_time = os.path.getmtime(file)
             if (time.time() - zip_file_time) > sec:
                 os.remove(file)
+
 
 def clean_tmp_directory():
     while True:
@@ -45,7 +52,7 @@ def clean_tmp_directory():
         time.sleep(400)
 
 
-#检测参数是否为空
+# 检测参数是否为空
 def isEmpty(params):
     for param in params:
         if param is None or param == '':
@@ -53,6 +60,8 @@ def isEmpty(params):
     return False
 
 # 取随机数
+
+
 def generate_random_number(digit=16):
     # 计算最小值和最大值
     min_value = 10 ** (digit - 1)
@@ -62,5 +71,28 @@ def generate_random_number(digit=16):
     return random_number
 
 
-
-
+def get_m3u8(url):
+    url = base64.b64decode(url).decode('utf-8')
+    headers = {
+        "Referer": "http://www.guangbomi.com",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+    }
+    response = requests.get(url, headers=headers, verify=False)
+    html = response.text
+    reg = 'iframe.*?src="(.+?)"'
+    m = re.search(reg, html)
+    if m:
+        url = m.group(1)
+        # 禁止重定向
+        response = requests.get(url, headers=headers,
+                                allow_redirects=False, verify=False)
+        location = response.headers['location']
+        # 匹配出完整url
+        reg = 'id=(.+?)$'
+        m = re.search(reg, location)
+        if m:
+            url = m.group(1)
+            return url
+        return location
+    else:
+        return None

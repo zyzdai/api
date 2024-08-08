@@ -1,17 +1,19 @@
 import os
 import threading
 from flask import Flask, request, jsonify, make_response, send_from_directory, redirect
-from module import ttson,edge_tts,tools,fanqie,jm,rar2zip,_51cg,dddd_ocr,randomImg
+from module import ttson, edge_tts, tools, fanqie, jm, rar2zip, _51cg, dddd_ocr
 app = Flask(__name__)
+
 
 @app.route('/ping')
 def ping():
     return 'pong'
 
+
 @app.route('/')
-def rImg():
-    img = randomImg.img()
-    return redirect(img)
+def index():
+    return 'ok'
+
 
 @app.route('/ttson', methods=['GET', 'POST'])
 def go_ttson():
@@ -24,6 +26,7 @@ def go_ttson():
         return jsonify({"code": "异常", "message": "参数不能为空"})
     url = ttson.create(voice_id, speed_factor, text, pitch_factor)
     return redirect(url)
+
 
 @app.route('/qqttson', methods=['GET', 'POST'])
 def go_qqttson():
@@ -62,12 +65,14 @@ def go_edge_tts():
     except Exception as e:
         return jsonify({"code": "异常", "message": "{}".format(e)})
 
+
 @app.route('/fanqie', methods=['GET'])
 def getContent_():
     item_id = request.args.get('item_id')
     if len(item_id) <= 0:
         return jsonify({"code": "异常", "message": "item_id参数不能为空"})
     return fanqie.getContent(item_id)
+
 
 @app.route('/jm', methods=['GET', 'POST'])
 def go_jm():
@@ -82,6 +87,7 @@ def go_jm():
         return response
     except Exception as e:
         return jsonify({"code": "异常", "message": "{}".format(e)})
+
 
 @app.route('/rar2zip')
 def go_r2z():
@@ -98,6 +104,7 @@ def go_r2z():
     except Exception as e:
         return jsonify({"code": "异常", "message": "{}".format(e)})
 
+
 @app.route('/51cg', methods=['GET', 'POST'])
 def cg_decrypt_image():
     url = request.args.get('url')
@@ -111,6 +118,16 @@ def cg_decrypt_image():
         return response
     except Exception as e:
         return jsonify({"code": "异常", "message": "{}".format(e)})
+
+
+@app.route('/guangbomi', methods=['GET', 'POST'])
+def go_guangbomi():
+    url = request.args.get('url')
+    if len(url) <= 0:
+        return jsonify({"code": "异常", "message": "url参数不能为空"})
+    m3u8_url = tools.get_m3u8(url)
+    return m3u8_url
+
 
 @app.route('/<opt>/<img_type>', methods=['POST'])
 @app.route('/<opt>/<img_type>/<ret_type>', methods=['POST'])
@@ -140,7 +157,6 @@ def slide(algo_type='compare', img_type='file', ret_type='text'):
         return dddd_ocr.set_ret(e, ret_type)
 
 
-
 if __name__ == '__main__':
     app.config["MODULE"] = 'module'
     app.config["TMP"] = 'tmp'
@@ -154,5 +170,3 @@ if __name__ == '__main__':
     clean_thread = threading.Thread(target=tools.clean_tmp_directory)
     clean_thread.start()
     app.run(host="0.0.0.0", port=8000)
-
-
