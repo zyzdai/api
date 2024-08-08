@@ -25,8 +25,7 @@ def generate_random_ip():
 def get_captcha():
     # 取随机数7694230510251072
     t = tools.generate_random_number()
-    url = f"https://u95167-bd74-2aef8085.westx.seetacloud.com:8443/flashsummary/captcha?0.{
-        t}"
+    url = f"https://u95167-bd74-2aef8085.westx.seetacloud.com:8443/flashsummary/captcha?0.{t}"
     code = dddd_ocr.get_captcha(url)
     return code
 
