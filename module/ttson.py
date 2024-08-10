@@ -87,7 +87,8 @@ def convert_to_wav(url):
     file_output = wav_path + '.wav'
     try:
         # Convert to WAV
-        convert_command = f'ffmpeg -y -i "{wav_path}" -acodec pcm_s16le -f s16le -ac 1 -ar 24000 "{file_output}" -loglevel error'
+        convert_command = f'ffmpeg -y -i "{
+            wav_path}" -acodec pcm_s16le -f s16le -ac 1 -ar 24000 "{file_output}" -loglevel error'
         convert_process = subprocess.run(
             convert_command, shell=True, capture_output=True, text=True)
         if convert_process.returncode != 0:

@@ -1,5 +1,4 @@
 import shutil
-from datetime import time
 import requests
 from urllib.parse import quote
 import rarfile
@@ -21,18 +20,8 @@ def rar2zip(rar_file):
         os.path.dirname(rar_file), file_name))
     shutil.rmtree(work_dir)
     os.remove(rar_file)
-    # 清除超过1天的zip文件
-    clear_zip_file()
     return zip_file+".zip"
 
-
-def clear_zip_file(sec=120):
-    zip_file_list = os.listdir(os.getcwd())
-    for file in zip_file_list:
-        if file.endswith('.zip') or file.endswith('mp3') or file.endswith('jpg'):
-            zip_file_time = os.path.getmtime(file)
-            if (time.time() - zip_file_time) > sec:
-                os.remove(file)
 
 
 def r2z(url):
@@ -49,8 +38,5 @@ def r2z(url):
         # 打开文件并写入内容
         with open(filePath, 'wb') as f:
             f.write(response.content)
-        print("文件下载完成:", filePath)
-    else:
-        print("文件下载失败")
-    zipName = rar2zip(filePath)
-    return zipName
+        zipName = rar2zip(filePath)
+        return zipName

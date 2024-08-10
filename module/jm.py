@@ -3,8 +3,7 @@ import os
 import uuid
 import requests
 from PIL import Image
-TMP_DIR = 'tmp/jm'
-os.makedirs(TMP_DIR, exist_ok=True)
+
 def get_num(aid, index):
     normalCutNum = 10  # 默认切割数
     aIndex = str(aid) + str(index)  # aid 和 index

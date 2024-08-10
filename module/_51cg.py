@@ -1,37 +1,13 @@
-import os
-import uuid
 import requests
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import padding
-from cryptography.hazmat.backends import default_backend
-TMP_DIR = 'tmp/51cg'
-os.makedirs(TMP_DIR, exist_ok=True)
+from module import tools
 
-
-def De(ciphertext, key, iv):
-    if not isinstance(key, bytes):
-        key = key.encode()
-    if not isinstance(iv, bytes):
-        iv = iv.encode()
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
-                    backend=default_backend())
-    decryptor = cipher.decryptor()
-    decrypted_data = decryptor.update(ciphertext) + decryptor.finalize()
-    unpadder = padding.PKCS7(128).unpadder()
-    data = unpadder.update(decrypted_data) + unpadder.finalize()
-    return data
-
-
-def decrypt_image(url):
-    out_path = os.path.join(TMP_DIR, f'{uuid.uuid4()}.jpg')
-    response = requests.get(url)
-    print(response.status_code)
+def decrypt_image(url,key,iv):
+    headers = {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+    }
+    response = requests.get(url, headers=headers)
     res = response.content
-    media_key = b'f5d965df75336270'
-    media_iv = b'97b60394abc2fbe1'
-    decrypted_bytes = De(res, media_key, media_iv)
-    with open(out_path, 'wb') as f:
-        f.write(decrypted_bytes)
-    return out_path
-
-# decrypt_image('https://pic.qhvxxpp.cn/upload/xiao/20240329/2024032911440758410.jpeg')
+    # media_key = b'f5d965df75336270'
+    # media_iv = b'97b60394abc2fbe1'
+    decrypted_bytes = tools.De(res, key.encode(), iv.encode())
+    return decrypted_bytes

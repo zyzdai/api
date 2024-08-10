@@ -1,10 +1,11 @@
 # 删除html标签
 import requests
-import os
 import random
 import re
-import time
 import base64
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.backends import default_backend
 TMP_DIR = 'tmp'
 # 删除html标签
 
@@ -13,43 +14,6 @@ def remove_html(string):
     regex = re.compile(r'<[^>]+>')
     return regex.sub('', string)
 
-# 删除tmp目录过期的文件
-
-
-def clearTmpFiles(sec=120):
-    files = os.listdir(os.path.join(os.getcwd(), 'tmp'))
-    for file in files:
-        if file.endswith('mp3') or file.endswith('wav'):
-            zip_file_time = os.path.getmtime(file)
-            if (time.time() - zip_file_time) > sec:
-                os.remove(file)
-
-
-def clean_tmp_directory():
-    while True:
-        print("Clearing tmp directory...")
-        # 清理逻辑，这里只是一个示例，你可以根据实际需求修改
-        for filename in os.listdir(TMP_DIR):
-
-            file_path = os.path.join(TMP_DIR, filename)
-            if os.path.isfile(file_path):
-                file_mtime = os.path.getmtime(file_path)
-                if time.time() - file_mtime > 360:  # 假设超过6分钟的文件为过期文件
-                    os.remove(file_path)
-                    print(f"Deleted expired file: {file_path}")
-            else:
-                # 进入子目录
-                for subfilename in os.listdir(file_path):
-                    print(subfilename)
-                    subfile_path = os.path.join(file_path, subfilename)
-                    if os.path.isfile(subfile_path):
-                        file_mtime = os.path.getmtime(subfile_path)
-                        if time.time() - file_mtime > 360:
-                            os.remove(subfile_path)
-                            print(f"Deleted expired file: {subfile_path}")
-
-        # 每隔一段时间执行一次清理操作，这里设定为每小时执行一次
-        time.sleep(400)
 
 
 # 检测参数是否为空
@@ -95,4 +59,18 @@ def get_m3u8(url):
             return url
         return location
     else:
-        return "服务器开小差啦"
+        return None
+
+
+def De(ciphertext, key, iv):
+    if not isinstance(key, bytes):
+        key = key.encode()
+    if not isinstance(iv, bytes):
+        iv = iv.encode()
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
+                    backend=default_backend())
+    decryptor = cipher.decryptor()
+    decrypted_data = decryptor.update(ciphertext) + decryptor.finalize()
+    unpadder = padding.PKCS7(128).unpadder()
+    data = unpadder.update(decrypted_data) + unpadder.finalize()
+    return data
