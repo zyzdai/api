@@ -1,6 +1,7 @@
 import requests
 from module import tools
 def decrypt_image(url,key,iv):
+    url = base64.b64decode(url).decode('utf-8')
     headers = {
         "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
     }
