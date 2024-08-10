@@ -95,4 +95,4 @@ def get_m3u8(url):
             return url
         return location
     else:
-        return None
+        return "服务器开小差啦"
