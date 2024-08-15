@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 import uuid
 from flask import Flask, request, jsonify, make_response
-from module import edge_tts, tools, fanqie, jm, rar2zip, _51cg, dddd_ocr,manwa
+from module import edge_tts, tools, fanqie, jm, rar2zip, _51cg, dddd_ocr,manwa,reecho
 app = Flask(__name__)
 
 @app.route('/')
@@ -149,6 +149,23 @@ def slide(algo_type='compare', img_type='file', ret_type='text'):
         return dddd_ocr.set_ret(result, ret_type)
     except Exception as e:
         return dddd_ocr.set_ret(e, ret_type)
+
+
+@app.route('/reecho', methods=['GET'])
+def go_reecho():
+    text = request.args.get('text')
+    voiceId = request.args.get('voiceId')
+    mode = request.args.get('mode')
+    is_None = tools.isEmpty((text, voiceId, mode))
+    if is_None:
+        return jsonify({"code": "异常", "message": "text、voice、mode参数不能为空"})
+    aud_io = BytesIO(reecho.get_reecho(text, voiceId, mode))
+    response = make_response(aud_io)
+    response.headers.set('Content-Disposition', 'attachment',
+                         filename=f'{uuid.uuid4()}.mp3')
+    response.headers.set('Content-Type', 'audio/mpeg')
+    return response
+
 
 
 if __name__ == '__main__':
