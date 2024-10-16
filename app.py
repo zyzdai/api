@@ -9,7 +9,7 @@ app = Flask(__name__)
 def index():
     return 'ok'
 
-@app.route('/edge_tts', methods=['GET', 'POST'])
+@app.route('/edge_tts', methods=['GET'])
 def go_edge_tts():
     text = request.args.get('text')
     voice = request.args.get('voice')
