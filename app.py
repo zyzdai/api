@@ -28,7 +28,29 @@ def go_edge_tts():
     response.headers.set('Content-Type', 'audio/mpeg')
     return response
 
+@app.route('/edge_tts_post', methods=['POST'])  # Changed to POST
+def go_edge_tts_post():
+    data = request.json  # Expecting JSON data in the POST request
+    text = data.get('text')
+    voice = data.get('voice')
+    rate = data.get('rate')
 
+    is_None = tools.isEmpty((text, voice, rate))
+    if is_None:
+        return jsonify({"code": "异常", "message": "参数不能为空"})
+
+    filePath = edge_tts.create(text, voice, rate)
+    data = BytesIO(open(filePath, 'rb').read())
+    # 删除临时文件
+    os.remove(filePath)
+
+    response = make_response(data)
+    # 设置响应头部信息，指定附件名称
+    response.headers.set('Content-Disposition', 'attachment',
+                         filename=f'{uuid.uuid4()}.mp3')
+    response.headers.set('Content-Type', 'audio/mpeg')
+    
+    return response
 
 @app.route('/fanqie', methods=['GET'])
 def getContent_():
