@@ -30,8 +30,9 @@ def go_edge_tts():
 
 @app.route('/edge_tts_post', methods=['POST'])  # Changed to POST
 def go_edge_tts_post():
+    print(request)
     data = request.json  # Expecting JSON data in the POST request
-    print(data)
+    
     text = data.get('text')
     voice = data.get('voice')
     rate = data.get('rate')
