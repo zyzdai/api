@@ -7,4 +7,4 @@
 #!tag=阿旺の库
 
 [Script]
-http-response ^https://reading.snssdk.com/reading/reader/full/v/\?item_id=* script-path=fq.js, requires-body=true, timeout=60
+http-response ^https://reading.snssdk.com/reading/reader/full/v/\?item_id=* script-path=https://raw.githubusercontent.com/zyzdai/api/refs/heads/main/fanqie.js, requires-body=true, timeout=60
