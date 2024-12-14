@@ -1,0 +1,6 @@
+let xiaoyuan = JSON.parse($response.body);
+
+console.log($response.body);
+xiaoyuan["vipSymbol"]=true;
+console.log(JSON.stringify(xiaoyuan));
+$done({body : JSON.stringify(xiaoyuan)});
