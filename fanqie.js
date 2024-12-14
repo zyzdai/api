@@ -1,4 +1,4 @@
-var res = {"a":123};
+var result = $response;
 
 
-$done({body:JSON.stringify(res)});
+$done({body:JSON.stringify(result)});
