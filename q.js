@@ -1,7 +1,10 @@
 const $ = new Env("查询油价");
 // 默认福建
-var region = $.getdata("oilArea") || "shanxi/linfen";
-console.log($environment.sourcePath)
+let arg = $environment.sourcePath;
+arg = arg.split('#')[1].split('=')[1]
+console.log(arg)
+var region = $.getdata("oilArea") || arg;
+
 
 const query_addr = `http://m.qiyoujiage.com/${region}.shtml`;
 
