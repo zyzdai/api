@@ -2,7 +2,6 @@ const $ = new Env("查询油价");
 // 默认福建
 let arg = $environment.sourcePath;
 arg = arg.split('#')[1].split('=')[1]
-console.log(arg)
 var region = $.getdata("oilArea") || arg;
 
 
